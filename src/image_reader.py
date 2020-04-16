@@ -2,6 +2,7 @@ import tensorflow as tf
 import os
 import math
 import random
+import numpy as np
 
 
 def read_image(path, image_size):
@@ -15,9 +16,10 @@ def read_image(path, image_size):
 class image_reader:
     files = []
 
-    def __init__(self, root_path, image_size):
+    def __init__(self, root_path, image_size, generator):
         self.image_size = image_size
         self.update_all_file_paths(root_path)
+        self.generator = generator
         random.shuffle(self.files)
 
     def update_all_file_paths(self, root_path):
@@ -30,11 +32,21 @@ class image_reader:
                 self.files.append(concat_path)
 
     def get_train_generator(self):
+        index = 0
+        random_label = random.random() * 0.5
         while True:
-            for path in self.files:
+            rand = random.random()
+            if rand >= 0.5:
                 try:
+                    path = self.files[index]
                     image = read_image(path, self.image_size)/255
                     x = tf.expand_dims(image, 0)
-                    yield (x, image)
+                    yield (x, 1 + random_label)
                 except:
                     print(path)
+                index += 1
+            else:
+                yield (self.generator.predict(), 0 + random_label)
+
+            if index >= len(self.files):
+                index = 0

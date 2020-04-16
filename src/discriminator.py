@@ -1,5 +1,5 @@
 import tensorflow.keras as keras
-import tensorflow.nn.layers as layers
+import tensorflow.keras.layers as layers
 
 
 class discriminator:
@@ -24,4 +24,3 @@ class discriminator:
 
     def summary(self):
         self.model.summary()
-
