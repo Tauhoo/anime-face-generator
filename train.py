@@ -7,7 +7,8 @@ from src.image_reader import image_reader
 """ set up config """
 config = configure()
 data_folder_path = config.source['data_folder_path']
-weight_file_path = config.source['weight_file_path']
+gen_weight_file_path = config.source['gen_weight_file_path']
+dis_weight_file_path = config.source['dis_weight_file_path']
 image_size = int(config.setting['image_size'])
 epochs = int(config.setting['epochs'])
 steps_per_epoch = int(config.setting['steps_per_epoch'])
@@ -16,7 +17,8 @@ channels = int(config.setting['channels'])
 iterations = int(config.setting['iterations'])
 
 """ set up generator """
-generator_object = generator(latent_size, image_size, channels)
+generator_object = generator(
+    latent_size, image_size, channels, gen_weight_file_path)
 generator_model = generator_object.model
 generator_object.summary()
 
@@ -25,11 +27,19 @@ image_reader = image_reader(data_folder_path, image_size, generator_object)
 train_data = image_reader.get_train_generator()
 
 """ set up discriminator """
-discriminator_object = discriminator(image_size, image_size, channels)
+discriminator_object = discriminator(
+    image_size, image_size, channels, dis_weight_file_path)
 discriminator_model = discriminator_object.model
 discriminator_object.summary()
 
 """ set up gan """
 gan_object = gan(discriminator_model, generator_model, latent_size, iterations)
 
-""" train """
+""" train discriminator """
+discriminator_model.fit(train_data, epochs=epochs,
+                        steps_per_epoch=steps_per_epoch)
+discriminator_object.save_weight()
+
+""" train gan """
+gan_object.train(epochs, steps_per_epoch)
+generator_object.save_weight()

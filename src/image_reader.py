@@ -41,12 +41,12 @@ class image_reader:
                     path = self.files[index]
                     image = read_image(path, self.image_size)/255
                     x = tf.expand_dims(image, 0)
-                    yield (x, 1 + random_label)
+                    yield (x, np.array([0 + random_label]))
                 except:
                     print(path)
                 index += 1
             else:
-                yield (self.generator.predict(), 0 + random_label)
+                yield (self.generator.predict(), np.array([1 + random_label]))
 
             if index >= len(self.files):
                 index = 0
