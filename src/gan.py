@@ -12,8 +12,6 @@ class gan:
         self.discriminator = discriminator_model
         self.generator = generator_model
 
-        self.discriminator.trainable = False
-
         gan_input = keras.Input(shape=(latent_size,))
         gan_output = self.discriminator(self.generator(gan_input))
         self.gan = keras.models.Model(gan_input, gan_output)
@@ -40,6 +38,7 @@ class gan:
             yield (np.array(extend_latent), np.array([y]))
 
     def train(self, epochs, steps_per_epoch):
+        self.discriminator.trainable = False
         a_loss = self.gan.fit(self.train_generator(epochs, steps_per_epoch), epochs=epochs,
                               steps_per_epoch=steps_per_epoch)
         return self

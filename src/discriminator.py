@@ -41,3 +41,8 @@ class discriminator:
         else:
             print("not found {}".format(self.weight_path))
         return self
+
+    def train(self, train_data, epochs, steps_per_epoch):
+        self.model.trainable = True
+        self.model.fit(train_data, epochs=epochs,
+                       steps_per_epoch=steps_per_epoch)

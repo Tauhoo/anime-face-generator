@@ -10,11 +10,15 @@ data_folder_path = config.source['data_folder_path']
 gen_weight_file_path = config.source['gen_weight_file_path']
 dis_weight_file_path = config.source['dis_weight_file_path']
 image_size = int(config.setting['image_size'])
-epochs = int(config.setting['epochs'])
-steps_per_epoch = int(config.setting['steps_per_epoch'])
+# epochs = int(config.setting['epochs'])
+# steps_per_epoch = int(config.setting['steps_per_epoch'])
 latent_size = int(config.setting['latent_size'])
 channels = int(config.setting['channels'])
 iterations = int(config.setting['iterations'])
+dis_epochs = int(config.setting['dis_epochs'])
+dis_steps_per_epoch = int(config.setting['dis_steps_per_epoch'])
+gan_epochs = int(config.setting['gan_epochs'])
+gan_steps_per_epoch = int(config.setting['gan_steps_per_epoch'])
 
 """ set up generator """
 generator_object = generator(
@@ -35,11 +39,12 @@ discriminator_object.summary()
 """ set up gan """
 gan_object = gan(discriminator_model, generator_model, latent_size, iterations)
 
-""" train discriminator """
-discriminator_model.fit(train_data, epochs=epochs,
-                        steps_per_epoch=steps_per_epoch)
-discriminator_object.save_weight()
+for index in range(iterations):
+    """ train discriminator """
+    discriminator_object.train(train_data, epochs=dis_epochs,
+                               steps_per_epoch=dis_steps_per_epoch)
+    discriminator_object.save_weight()
 
-""" train gan """
-gan_object.train(epochs, steps_per_epoch)
-generator_object.save_weight()
+    """ train gan """
+    gan_object.train(gan_epochs, gan_steps_per_epoch)
+    generator_object.save_weight()

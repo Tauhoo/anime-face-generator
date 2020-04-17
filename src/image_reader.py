@@ -20,6 +20,7 @@ class image_reader:
         self.image_size = image_size
         self.update_all_file_paths(root_path)
         self.generator = generator
+        self.files = [*self.files, *[0]*len(self.files)]
         random.shuffle(self.files)
 
     def update_all_file_paths(self, root_path):
@@ -35,18 +36,17 @@ class image_reader:
         index = 0
         random_label = random.random() * 0.5
         while True:
-            rand = random.random()
-            if rand >= 0.5:
+            path = self.files[index]
+            if path == 0:
+                yield (self.generator.predict(), np.array([1 + random_label]))
+            else:
                 try:
-                    path = self.files[index]
                     image = read_image(path, self.image_size)/255
                     x = tf.expand_dims(image, 0)
                     yield (x, np.array([0 + random_label]))
                 except:
                     print(path)
-                index += 1
-            else:
-                yield (self.generator.predict(), np.array([1 + random_label]))
+            index += 1
 
             if index >= len(self.files):
                 index = 0
